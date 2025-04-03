@@ -90,17 +90,84 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = util.Stack()
+    frontier.push((problem.getStartState(),[]))
+    visited = set()
+
+    while frontier.isEmpty() == False:
+        curr, path = frontier.pop()
+
+        if problem.isGoalState(curr):
+            return path
+
+        if curr in visited:
+            continue
+
+        visited.add(curr)
+
+        for successor in problem.getSuccessors(curr):
+            nextState, action, cost = successor
+            if nextState not in visited:
+                newPath = path + [action]
+                frontier.push((nextState, newPath))
+
+    return []
+
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = util.Queue()
+    frontier.push((problem.getStartState(),[]))
+    visited = set()
+
+    while frontier.isEmpty() == False:
+        curr, path = frontier.pop()
+
+        if problem.isGoalState(curr):
+            return path
+
+        if curr in visited:
+            continue
+
+        visited.add(curr)
+
+        for successor in problem.getSuccessors(curr):
+            nextState, action, cost = successor
+            if nextState not in visited:
+                newPath = path + [action]
+                frontier.push((nextState, newPath))
+
+    return []
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = util.PriorityQueue()
+    frontier.push((problem.getStartState(), []), 0)
+    visited = {}
+
+    while frontier.isEmpty() == False:
+        curr, path = frontier.pop()  
+        cost = problem.getCostOfActions(path)
+
+        if problem.isGoalState(curr):
+            return path
+        
+        if curr in visited and visited[curr] <= cost:
+            continue
+
+        visited[curr] = cost 
+
+        for successor in problem.getSuccessors(curr):
+            nextState, action, stepCost = successor
+            if nextState not in visited or newCost < visited[nextState]:
+                newCost = cost + stepCost
+                newPath = path + [action]
+                frontier.push((nextState, newPath), newCost)
+
+    return []
+
 
 def nullHeuristic(state, problem=None) -> float:
     """
