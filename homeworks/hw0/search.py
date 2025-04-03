@@ -161,8 +161,8 @@ def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
 
         for successor in problem.getSuccessors(curr):
             nextState, action, stepCost = successor
+            newCost = cost + stepCost
             if nextState not in visited or newCost < visited[nextState]:
-                newCost = cost + stepCost
                 newPath = path + [action]
                 frontier.push((nextState, newPath), newCost)
 
@@ -179,7 +179,32 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = util.PriorityQueue()
+    start = problem.getStartState()
+    frontier.push((start, []), 0 + heuristic(start, problem))
+    visited = {}
+
+    while frontier.isEmpty() == False:
+        curr, path = frontier.pop()  
+        cost = problem.getCostOfActions(path)
+
+        if problem.isGoalState(curr):
+            return path
+        
+        if curr in visited and visited[curr] <= cost:
+            continue
+
+        visited[curr] = cost 
+
+        for successor in problem.getSuccessors(curr):
+            nextState, action, stepCost = successor
+            newCost = cost + stepCost 
+            if nextState not in visited or newCost < visited[nextState]:
+                newPath = path + [action]
+                frontier.push((nextState, newPath), newCost + heuristic(nextState, problem))
+
+    return []
+
 
 # Abbreviations
 bfs = breadthFirstSearch
