@@ -194,21 +194,22 @@ class ValueIterationAgent(Agent):
         "*** YOUR CODE HERE ***"
 
         for _ in range(self.iterations):
-            valuesk1 = self.values.copy()
+            valuesk = self.values.copy()
 
             for state in self.mdp.getStates():
                 
-                qvalues = {}
-
+                maxQvalue = float('-inf')
                 for action in self.mdp.getPossibleActions(state):
-                    qvalues[action] = self.computeQValueFromValues(state, action)
+                    qvalue = self.computeQValueFromValues(state, action)
 
-                if (qvalues):
-                    valuesk1[state] = max(qvalues.values())
+                    if (qvalue > maxQvalue):
+                        maxQvalue = qvalue
+                if maxQvalue is not float('inf'):
+                    valuesk[state] = maxQvalue
                 else:
-                    valuesk1[state] = 0
+                    valuesk[state] = 0
             
-            self.values = valuesk1
+            self.values = valuesk
 
 
     def getValue(self, state):
@@ -225,11 +226,11 @@ class ValueIterationAgent(Agent):
         """
         "*** YOUR CODE HERE ***"
 
-        qvalue = util.Counter()
-        for (nextState, prob) in self.mdp.getTransitionStatesAndProbs(state, action):
-            qvalue[nextState] = prob * (self.mdp.getReward(state, action, nextState) + self.discount * self.getValue(nextState))
-        return qvalue.totalCount()
-
+        qvalue = 0
+        for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
+            reward = self.mdp.getReward(state, action, nextState)
+            qvalue += prob * (reward + self.discount * self.getValue(nextState))
+        return qvalue
 
 
 
@@ -245,7 +246,7 @@ class ValueIterationAgent(Agent):
         "*** YOUR CODE HERE ***"
 
         bestAction = None
-        maxQvalue = float("-inf")
+        maxQvalue = float('-inf')
 
         for action in self.mdp.getPossibleActions(state):
             qvalue = self.computeQValueFromValues(state, action)
